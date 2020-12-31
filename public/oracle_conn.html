@@ -1,0 +1,103 @@
+<html>
+<head>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script> 
+<script> 
+    $(document).ready(function() {
+        function  selectData(){
+            $('#output').empty();
+            $.getJSON('/select/', function(data){      
+                $(data).each(function (index, item){
+                    // alert( item[0] + item[1] + item[2] );  
+                    var  output ='';
+                    output += '<tr><td>'+item[0]+'</td><td> <a id=content name='+item[0]+' onclick=con(this)>'+ item[1] + ' </a> </td><td>' + item[2] + '</td>' ;
+                    output += '<td><button id=delete name='+item[0]+' onclick=del(this) > 삭제 </button></td></tr>';
+                    $('#output').append(output);                
+                });
+            });
+        } 
+   
+   
+        $('#insert_form').submit(function(event){
+            var data = $(this).serialize();
+            $.post('/insert/', data, selectData);                      
+            $('#id').val('');
+            $('#pwd').val('');
+            event.preventDefault();
+        });
+        selectData();
+    });
+ 
+    function del(delBtn){        
+        var rStr = delBtn.name; 
+        var query = { idx : rStr };  
+        $.ajax({
+            type: "delete",
+            url: "/delete/",
+            data: query,
+            success: function(data){
+                location.href='http://127.0.0.1:52273/oracle_conn.html';
+            }
+        });
+    }
+  
+
+    function con(conBtn){        
+        var rStr = conBtn.name; 
+        var query = { idx : rStr };  
+        $.ajax({
+            type: "get",
+            url: "/content",
+            data: query,
+            success: function(data){
+                $(data).each(function (index, item){
+                    $('#output').empty();                    
+                    var  output ='';                    
+                    output += '<tr><td>'+item[0]+'</td><td> <a id=content name='+item[0]+' onclick=con(this)>'+ item[1] + ' </a> </td><td>' + item[2] + '</td>' ;
+                    output += '<td><button id=delete name='+item[0]+' onclick=del(this) > 삭제 </button></td></tr>';
+                    $('#output').append(output);
+                });
+            }
+        });
+    }
+  
+
+</script>
+
+
+<style>
+a:link {
+    text-decoration: none;
+}
+a:visited {
+    text-decoration: none;
+}
+a:hover {
+     text-decoration: underline;
+}
+a:active {
+    text-decoration: underline;
+}
+</style>
+
+</head>
+<body>
+<body>
+<div>
+<form id = "insert_form">
+이름 : <input  type="text" id="id" name="id"  /> <br/>
+암호 : <input  type="text" id="pwd" name="pwd" /> <br/><br/>
+<input  type="submit" value="추가하기" > &emsp;&emsp;   <br/>
+</form>
+</div>
+
+<h1> 추가 </h1>
+<table id="output"  border="1"  width="350">
+</table>
+
+<hr> 
+
+<button id="get"
+    onClick="location.href='http://127.0.0.1:52273/oracle_conn.html'" > 전체보기</button>
+
+</body>
+</html>
